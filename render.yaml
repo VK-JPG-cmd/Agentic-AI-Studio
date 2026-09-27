@@ -1,0 +1,29 @@
+# Render Blueprint Specification for Agentic AI Studio
+# Deploy instantly at https://dashboard.render.com/blueprints
+
+services:
+  - type: web
+    name: agentic-ai-studio
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: HF_MODEL_ID
+        value: meta-llama/Llama-3.1-8B-Instruct
+      - key: HF_BASE_URL
+        value: https://router.huggingface.co/v1
+      - key: LLM_TIMEOUT
+        value: "30.0"
+      - key: USE_MOCK_LLM
+        value: "false"
+      - key: LLM_FALLBACK_TO_MOCK
+        value: "true"
+      # Securely prompt for token during deployment in the Render UI
+      - key: HF_TOKEN
+        sync: false

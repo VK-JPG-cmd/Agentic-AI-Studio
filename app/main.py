@@ -198,3 +198,10 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
 frontend_dist = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "dist")
 if os.path.exists(frontend_dist):
     app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    cfg = get_settings()
+    uvicorn.run("app.main:app", host=cfg.api_host, port=cfg.api_port, reload=False)
+

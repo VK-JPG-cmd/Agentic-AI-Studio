@@ -277,10 +277,39 @@ Run the full pytest suite:
 pytest -v
 ```
 
-The **50 automated tests** include:
+The **60 automated tests** include:
 - **Multi-step Tasks**: Weather + calculation, Search + calculation, Search + weather.
 - **Error Recovery**: Automatic recovery when tool calls fail with invalid inputs.
 - **Guardrails**: Maximum 8 tool calls per run, maximum iterations limit, and execution timeouts.
 - **Step Categorization**: Verification of `THINK/DECISION`, `TOOL_CALL`, `TOOL_RESULT`, and `FINAL` step logs.
 - **AST Safety**: Validates arithmetic and comparison expressions while strictly barring arbitrary code execution.
 - **Persistence**: SQLite session state and audit trail logging.
+
+---
+
+## ☁️ Deploying to Render (Free Cloud Hosting)
+
+This project is fully optimized for **[Render](https://render.com/)** with zero-configuration Docker and Blueprint support.
+
+### Option 1: 1-Click Render Blueprint (Recommended)
+
+1. Go to your **[Render Dashboard](https://dashboard.render.com/)**.
+2. Click **New +** → **Blueprint**.
+3. Connect your repository: `VK-JPG-cmd/Agentic-AI-Studio`.
+4. Render will read `render.yaml` automatically.
+5. In the environment setup, provide your **`HF_TOKEN`** (from [Hugging Face Settings](https://huggingface.co/settings/tokens)).
+6. Click **Apply**. Your app will build and deploy on Render's free tier with automated health checks!
+
+### Option 2: Manual Web Service Setup (Docker)
+
+1. On Render, click **New +** → **Web Service**.
+2. Connect your GitHub repository.
+3. Choose **Docker** as the Runtime.
+4. Set the Environment Variables:
+   - `APP_ENV`: `production`
+   - `HF_TOKEN`: `<your_hugging_face_token>`
+   - `HF_MODEL_ID`: `meta-llama/Llama-3.1-8B-Instruct`
+   - `HF_BASE_URL`: `https://router.huggingface.co/v1`
+   - `LLM_FALLBACK_TO_MOCK`: `true`
+5. Click **Create Web Service**. Render builds the multi-stage Docker image and serves both the FastAPI API and the React frontend on your assigned `https://<service-name>.onrender.com` URL.
+

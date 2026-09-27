@@ -15,8 +15,8 @@ class Settings(BaseSettings):
 
     app_env: str = Field(default="development", alias="APP_ENV")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
-    api_host: str = Field(default="0.0.0.0", alias="API_HOST")
-    api_port: int = Field(default=8000, alias="API_PORT")
+    api_host: str = Field(default="0.0.0.0", validation_alias=AliasChoices("HOST", "API_HOST"))
+    api_port: int = Field(default=8000, validation_alias=AliasChoices("PORT", "API_PORT"))
 
     # SQLite Database
     database_path: str = Field(default="agentic_ai.db", alias="DATABASE_PATH")
