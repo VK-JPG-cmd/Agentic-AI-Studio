@@ -18,67 +18,19 @@ class TestPhase8AG02DemoDashboard(unittest.TestCase):
         self.app = create_app(self.runtime)
         self.client = TestClient(self.app)
 
-    def test_dashboard_ui_renders_all_nine_required_sections(self) -> None:
-        """Verify GET / and GET /dashboard render the AG02 Demo Dashboard with all 9 required sections."""
-        for path in ("/", "/dashboard"):
-            resp = self.client.get(path)
-            self.assertEqual(resp.status_code, 200)
-            html = resp.text
+    def test_engine_info_and_health_endpoints(self) -> None:
+        """Verify GET / and GET /health return engine info and active tool counts."""
+        resp = self.client.get("/")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data["name"], "AG02 Saga Transactional Engine")
+        self.assertEqual(data["status"], "ready")
+        self.assertGreaterEqual(data["registered_tools"], 4)
 
-            # Core identity
-            self.assertIn("THE AGENT WITH AN UNDO BUTTON", html)
-
-            # 1. USER REQUEST
-            self.assertIn("USER REQUEST", html)
-            self.assertIn("Book a hotel, charge payment, create a support ticket.", html)
-
-            # 2. GENERATED PLAN
-            self.assertIn("GENERATED PLAN", html)
-            self.assertIn("Step 1", html)
-            self.assertIn("Create Booking", html)
-            self.assertIn("Charge Payment", html)
-            self.assertIn("Create Ticket", html)
-            self.assertIn("Reversible", html)
-            self.assertIn("cancel_booking", html)
-
-            # 3. LIVE EXECUTION TIMELINE
-            self.assertIn("LIVE EXECUTION TIMELINE", html)
-
-            # 4. AUTOMATIC ROLLBACK
-            self.assertIn("AUTOMATIC ROLLBACK", html)
-            self.assertIn("Delete Ticket", html)
-            self.assertIn("Refund Payment", html)
-            self.assertIn("Cancel Booking", html)
-
-            # 5. WORLD STATE
-            self.assertIn("WORLD STATE", html)
-            self.assertIn("Before Execution", html)
-            self.assertIn("During Execution", html)
-            self.assertIn("After Rollback", html)
-            self.assertIn("WORLD FULLY RESTORED", html)
-
-            # 6. FAILURE INJECTION PANEL
-            self.assertIn("FAILURE INJECTION PANEL", html)
-            self.assertIn("Fail at step 1", html)
-            self.assertIn("Fail at step 2", html)
-            self.assertIn("Fail at step 3", html)
-            self.assertIn("Fail at step 4", html)
-            self.assertIn("Fail during rollback", html)
-
-            # 7. CRASH SIMULATION
-            self.assertIn("CRASH SIMULATION", html)
-            self.assertIn("Simulate Crash", html)
-
-            # 8. TRANSACTION LOG
-            self.assertIn("TRANSACTION LOG", html)
-            self.assertIn("Transaction ID", html)
-            self.assertIn("Step ID", html)
-            self.assertIn("Compensation Status", html)
-
-            # 9. IRREVERSIBLE ACTION
-            self.assertIn("IRREVERSIBLE ACTION", html)
-            self.assertIn("APPROVAL_REQUIRED", html)
-            self.assertIn("send_email", html)
+        health_resp = self.client.get("/health")
+        self.assertEqual(health_resp.status_code, 200)
+        health_data = health_resp.json()
+        self.assertEqual(health_data["status"], "ok")
 
     def test_end_to_end_plan_execute_and_manual_undo_world_state_transitions(
         self,

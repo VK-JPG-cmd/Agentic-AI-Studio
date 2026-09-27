@@ -13,10 +13,9 @@ from typing import Any, AsyncGenerator, Dict, Optional
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.api.dashboard import DASHBOARD_HTML
 from app.api.routes import AG02Runtime, create_router as create_ag02_router
 
 from app.agent.agent import Agent
@@ -205,12 +204,6 @@ app.state.ag02_runtime = ag02_runtime
 # Mount AG02 API router
 ag02_router = create_ag02_router(ag02_runtime)
 app.include_router(ag02_router, prefix="/ag02", tags=["AG02 Saga Undo Engine"])
-
-# Serve AG02 interactive dashboard at /dashboard
-@app.get("/dashboard", response_class=HTMLResponse, tags=["AG02 Saga Undo Engine"])
-def serve_ag02_dashboard() -> HTMLResponse:
-    """Serve the AG02 'Agent with an Undo Button' interactive control plane dashboard."""
-    return HTMLResponse(content=DASHBOARD_HTML)
 
 
 def create_app(runtime: Optional[AG02Runtime] = None) -> FastAPI:

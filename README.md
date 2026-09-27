@@ -243,32 +243,30 @@ LLM_TIMEOUT=30.0
 
 ---
 
-## 🖥️ Running the User Interfaces
+## 🖥️ Running the Unified React Studio
 
-### 1. Agentic AI Studio (React Frontend)
-FastAPI automatically serves the built React frontend at port 8000:
+FastAPI automatically serves the production-built React frontend at port 8000:
 ```powershell
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 Open **[http://localhost:8000](http://localhost:8000)** in your browser.
-- **Interactive Chat Stream**: Input goals, view conversational turns, and inspect execution durations.
-- **Preset Demo Buttons**: One-click demo triggers for multi-step weather comparisons, arithmetic, browser tab opening, and search.
-- **Visual Execution Stepper**: Vertical timeline mapping `USER REQUEST` → `AGENT DECISION` → `TOOL_CALL` → `TOOL_RESULT` → `FINAL ANSWER`.
-- **Sage & Mint Palette**: High-contrast, accessibility-tested dark theme with smooth glassmorphism.
-- **Undo & Saga Link**: Direct header access to the AG02 Control Plane dashboard.
 
-### 2. AG02 Saga & Undo Control Plane Dashboard
-Open **[http://localhost:8000/dashboard](http://localhost:8000/dashboard)** (or `/ag02/`).
-The AG02 control plane provides 9 real-time visual sections:
-1. **System Status & Health**: Live runtime metrics, active database, crash recovery state.
-2. **Current World State**: Live tracking of Flight Bookings, Hotel Reservations, Payment ledger, and Tickets.
-3. **Interactive Plan Runner**: Execute travel bookings (`book_flight`, `reserve_hotel`, `charge_payment`, `issue_ticket`).
-4. **The Undo Button**: Instantly triggers reverse compensation (`refund_payment`, `cancel_hotel`, `cancel_flight`) to restore the deterministic mock world back to its original state.
-5. **Approval Interlock**: Gated execution for irreversible actions (e.g. `send_confirmation_email`), requiring user approval before dispatch.
-6. **Failure & Fault Injection Matrix**: Injects failures at any step (e.g., Step 3 Payment failure) to demonstrate automatic reverse rollback.
-7. **Crash Simulator**: Simulates mid-transaction node crashes and tests automated recovery on reboot.
-8. **Durable SQLite Transaction Log**: Real-time audit log of transaction IDs, step states, and encrypted payloads.
-9. **Event Stream Log**: Live inspection of state transitions and compensation events.
+The frontend includes a seamless header **Mode Switcher** styled in the Sage & Mint palette:
+
+### 1. 💬 Autonomous Agent Mode
+- **ReAct Planning & Execution Loop**: Dynamic goal orchestration, AST calculator, live weather lookup, web search, and browser automation.
+- **Visual Stepper Timeline**: Step-by-step breakdown of `THINK/DECISION` → `TOOL_CALL` → `TOOL_RESULT` → `FINAL ANSWER`.
+- **Quick Preset Prompts**: One-click demo triggers for multi-step goals.
+- **Browser Automation Actions**: Launch client-side tabs directly with popup blocker detection.
+
+### 2. 🔄 Saga & Undo Studio Mode
+Built entirely with React matching your project's Sage & Mint dark theme (`#6CAD96`, `#89BDAB`, `#A7CEC0`, `#C4DED5`, `#E2EFEA`):
+- **Deterministic Mock World Ribbon**: Live entity trackers for Flights, Hotels, Payments, Support Tickets, and Dispatched Emails, plus a 1-click **Reset World** button.
+- **The Manual UNDO BUTTON**: Reverts any completed transaction by dispatching compensating actions in reverse order until the world state is 100% restored.
+- **Interactive Scenarios**: Instant presets for Complete Booking, Payment Faults (Step 2 auto-rollback), Irreversible Approval Gates, and Node Crash Simulations.
+- **Fault Injection Matrix**: Dynamic toggles to inject failures at Step 1, 2, 3, or during rollback.
+- **Human-in-the-Loop Approval Interlock**: Real-time approval dialog for non-compensable actions (e.g. `send_confirmation_email`).
+- **Inspection Tabs**: Live Saga Stepper, Before/Peak/After World Comparison Matrix, and Durable SQLite Event Log.
 
 ---
 

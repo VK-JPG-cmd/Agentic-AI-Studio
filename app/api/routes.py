@@ -5,10 +5,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
-
-from app.api.dashboard import DASHBOARD_HTML
 from app.core import (
     Agent,
     ApprovalManager,
@@ -187,10 +184,15 @@ def create_router(runtime: AG02Runtime) -> APIRouter:
     """Create the FastAPI router bound to the given AG02Runtime instance."""
     router = APIRouter()
 
-    @router.get("/", response_class=HTMLResponse)
-    @router.get("/dashboard", response_class=HTMLResponse)
-    def serve_dashboard() -> HTMLResponse:
-        return HTMLResponse(content=DASHBOARD_HTML)
+    @router.get("/")
+    def info() -> dict[str, Any]:
+        return {
+            "name": "AG02 Saga Transactional Engine",
+            "version": "1.0.0",
+            "status": "ready",
+            "registered_tools": len(runtime.registry.list_tools()),
+            "transactions_count": len(runtime.transaction_manager.list_transactions()),
+        }
 
     @router.get("/health")
     def health_check() -> dict[str, Any]:
