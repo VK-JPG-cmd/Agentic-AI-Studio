@@ -194,6 +194,10 @@ export default function App() {
       title: 'Open Browser Tab',
       prompt: 'Open a new tab in my browser',
     },
+    {
+      title: 'Undo & Saga Engine',
+      prompt: 'How does the AG02 transactional engine with Undo Button and Saga compensation work?',
+    },
   ]
 
   return (
@@ -237,6 +241,15 @@ export default function App() {
               <span>Tools: {healthStatus.tools_available.length} active</span>
             </div>
           )}
+          <a
+            href="/dashboard"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="status-pill saga-link-pill"
+            title="Open AG02 Saga & Undo Control Plane Dashboard"
+          >
+            <span>🔄 Undo & Saga Control Plane ↗</span>
+          </a>
         </div>
       </header>
 

@@ -9,12 +9,15 @@ Defines REST endpoints for the Agentic AI system:
 from contextlib import asynccontextmanager
 import logging
 import os
-from typing import Any, AsyncGenerator, Dict
+from typing import Any, AsyncGenerator, Dict, Optional
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+
+from app.api.dashboard import DASHBOARD_HTML
+from app.api.routes import AG02Runtime, create_router as create_ag02_router
 
 from app.agent.agent import Agent
 from app.config import get_settings
@@ -192,6 +195,42 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"detail": "Internal server error occurred."},
     )
+
+
+# Initialize AG02 Transactional Runtime & mount router
+ag02_runtime = AG02Runtime()
+app.state.runtime = ag02_runtime
+app.state.ag02_runtime = ag02_runtime
+
+# Mount AG02 API router
+ag02_router = create_ag02_router(ag02_runtime)
+app.include_router(ag02_router, prefix="/ag02", tags=["AG02 Saga Undo Engine"])
+
+# Serve AG02 interactive dashboard at /dashboard
+@app.get("/dashboard", response_class=HTMLResponse, tags=["AG02 Saga Undo Engine"])
+def serve_ag02_dashboard() -> HTMLResponse:
+    """Serve the AG02 'Agent with an Undo Button' interactive control plane dashboard."""
+    return HTMLResponse(content=DASHBOARD_HTML)
+
+
+def create_app(runtime: Optional[AG02Runtime] = None) -> FastAPI:
+    """Create and configure an AG02 FastAPI test application instance."""
+    app_runtime = runtime or AG02Runtime()
+    test_app = FastAPI(
+        title="AG02: The Agent With An Undo Button",
+        description="Transactional execution layer for a tool-calling AI agent inspired by the Saga pattern.",
+        version="1.0.0",
+    )
+    test_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    test_app.state.runtime = app_runtime
+    test_app.include_router(create_ag02_router(app_runtime))
+    return test_app
 
 
 # Mount built React frontend if present

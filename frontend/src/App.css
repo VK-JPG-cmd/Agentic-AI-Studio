@@ -75,6 +75,23 @@
   color: var(--text-secondary);
 }
 
+.saga-link-pill {
+  transition: all 0.2s ease;
+  background: rgba(108, 173, 150, 0.16) !important;
+  color: var(--palette-4) !important;
+  border-color: rgba(108, 173, 150, 0.35) !important;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.saga-link-pill:hover {
+  background: rgba(108, 173, 150, 0.32) !important;
+  color: #ffffff !important;
+  border-color: var(--palette-1) !important;
+  box-shadow: 0 0 12px rgba(108, 173, 150, 0.3);
+  transform: translateY(-1px);
+}
+
 .status-indicator {
   width: 8px;
   height: 8px;

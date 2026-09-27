@@ -1,36 +1,35 @@
-# Agentic AI Application (Phase 5 — React Demo UI & Autonomous Engine)
+# Agentic AI Studio & AG02 Transactional Engine
 
-A modular, hackathon-grade Agentic AI application built with **React**, **FastAPI**, **SQLite**, and **Pydantic**, designed to orchestrate tool-using autonomous workflows powered by LLM inference (Hugging Face Inference API).
+A unified, production-grade Agentic AI application built with **React**, **FastAPI**, **SQLite**, and **Pydantic**. Combines:
+1. **Autonomous Agentic Loop**: Multi-step planning, tool orchestration, and real-time reflection powered by LLM inference (Hugging Face Inference API / Llama 3.1).
+2. **AG02 Transactional Saga Engine**: Saga-pattern deterministic execution with reversible actions, crash recovery, human-in-the-loop approval gating, failure injection, an interactive 9-section control plane dashboard (`/dashboard`), and a manual **Undo Button**.
 
 ---
 
 ## 🏛️ Architecture Overview
 
-The agent executes multi-step goals through an explicit planning and observation loop:
+The system features two complementary execution engines sharing a unified FastAPI backend:
 
 ```text
-USER GOAL
-   │
-   ▼
-[THINK/DECISION] (Concise plan: e.g. "weather information required for Chennai")
-   │
-   ▼
-[TOOL_CALL] (weather, city="Chennai", call_id="call_a1b2c3d4")
-   │
-   ▼
-[TOOL_RESULT] (32°C, Humid)
-   │
-   ▼
-[THINK/DECISION] (Concise plan: e.g. "calculation required: 32 > 30")
-   │
-   ▼
-[TOOL_CALL] (calculator, expression="32 > 30", call_id="call_e5f6g7h8")
-   │
-   ▼
-[TOOL_RESULT] (True)
-   │
-   ▼
-[FINAL] ("The current temperature in Chennai is 32°C, which is above 30°C.")
+                                  ┌─────────────────────────────┐
+                                  │      Agentic AI Studio      │
+                                  └──────────────┬──────────────┘
+                                                 │
+                        ┌────────────────────────┴────────────────────────┐
+                        ▼                                                 ▼
+        ┌───────────────────────────────┐                 ┌───────────────────────────────┐
+        │     Autonomous Agent Loop     │                 │   AG02 Saga Transactional     │
+        │       (ReAct Planning)        │                 │            Engine             │
+        ├───────────────────────────────┤                 ├───────────────────────────────┤
+        │ • Multi-step Goal Planning    │                 │ • Forward Actions             │
+        │ • AST Calculator              │                 │   (book_flight, reserve_hotel,│
+        │ • OpenWeatherMap / Search     │                 │    charge_payment)            │
+        │ • Browser Window Launching    │                 │ • Exact Compensations         │
+        │ • Guardrails & Token Budgets  │                 │ • Approval Gates (Email)      │
+        │ • Realtime Stepper Timeline   │                 │ • Crash Recovery & Replay     │
+        │ • React Sage/Mint Theme UI    │                 │ • Manual Undo Button          │
+        └───────────────────────────────┘                 │ • 9-Section Control Plane UI  │
+                                                          └───────────────────────────────┘
 ```
 
 ### Directory Structure
@@ -39,29 +38,32 @@ USER GOAL
 agentic-ai/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py          # FastAPI application & REST endpoints
-│   ├── config.py        # Pydantic Settings & SecretStr masking
-│   ├── llm/             # LLM provider abstraction & Hugging Face integration
-│   │   ├── __init__.py
-│   │   ├── base.py      # Abstract LLMClient, LLMMessage, LLMResponse, custom exceptions
-│   │   └── huggingface.py# HuggingFaceLLMClient with function calling & router support
-│   ├── agent/
-│   │   ├── __init__.py
-│   │   └── agent.py     # Multi-step Agent orchestrator & state tracker
-│   ├── tools/           # Extensible tool subsystem
-│   │   ├── __init__.py
-│   │   └── registry.py  # BaseTool, Pydantic input schemas, AST calculator, weather, search
-│   ├── models/
-│   │   ├── __init__.py
-│   │   └── schemas.py   # Data contracts: StepType, AgentStep, UserRequest, ToolCall, ToolResult, AgentResponse, AgentState
-│   └── db/
-│       ├── __init__.py
-│       └── database.py  # SQLite connection management & session/audit trail persistence
-├── tests/               # 50 unit and integration tests (100% mocked offline)
-├── .env.example         # Environment template
-├── .gitignore           # Git ignore rules for virtualenv, db, & secrets
-├── requirements.txt     # Locked dependencies
-└── README.md            # Project documentation
+│   ├── main.py                 # FastAPI application, REST endpoints & static frontend mount
+│   ├── config.py               # Pydantic Settings & SecretStr masking
+│   ├── api/                    # AG02 REST & Dashboard API
+│   │   ├── dashboard.py        # 9-section AG02 interactive HTML control plane
+│   │   └── routes.py           # /ag02 endpoints (run, undo, inject-fault, approve, crash)
+│   ├── core/                   # AG02 Transactional Engine modules
+│   │   ├── agent.py            # Plan execution & compensation runner
+│   │   ├── transaction_manager.py # Saga transaction state machine
+│   │   ├── compensation_manager.py# Reverse compensation orchestrator
+│   │   ├── durable_log.py      # SQLite durable transaction log
+│   │   ├── recovery_manager.py # Crash recovery & transaction replay
+│   │   ├── approval_manager.py # Human-in-the-loop approval gates
+│   │   ├── fault_injector.py   # Step & compensation failure injection
+│   │   ├── mock_world.py       # Deterministic world state tracker
+│   │   ├── tool_registry.py    # Reversible tool definitions
+│   │   └── llm_agent.py        # Structured plan generation
+│   ├── agent/                  # Autonomous ReAct Agent orchestrator & state tracker
+│   ├── tools/                  # Extensible tools (AST Calculator, Weather, Search, Browser)
+│   ├── models/                 # Shared Pydantic data schemas
+│   └── db/                     # SQLite connection management & audit trail
+├── frontend/                   # React + Vite UI (Sage & Mint design palette)
+├── tests/                      # 126 automated unit and integration tests
+├── .env.example                # Environment template
+├── Dockerfile                  # Multi-stage Docker container
+├── render.yaml                 # 1-click Render blueprint
+└── README.md                   # Project documentation
 ```
 
 ---
@@ -241,32 +243,32 @@ LLM_TIMEOUT=30.0
 
 ---
 
-## 🖥️ Running the Demo UI (Phase 5)
+## 🖥️ Running the User Interfaces
 
-The application features a modern React UI with live chat, prompt presets, and a real-time **Tool Execution Timeline** displaying decisions, tool dispatches, observations, and final synthesized answers.
-
-### Option A: Run Fullstack via FastAPI (Recommended)
+### 1. Agentic AI Studio (React Frontend)
 FastAPI automatically serves the built React frontend at port 8000:
 ```powershell
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 Open **[http://localhost:8000](http://localhost:8000)** in your browser.
+- **Interactive Chat Stream**: Input goals, view conversational turns, and inspect execution durations.
+- **Preset Demo Buttons**: One-click demo triggers for multi-step weather comparisons, arithmetic, browser tab opening, and search.
+- **Visual Execution Stepper**: Vertical timeline mapping `USER REQUEST` → `AGENT DECISION` → `TOOL_CALL` → `TOOL_RESULT` → `FINAL ANSWER`.
+- **Sage & Mint Palette**: High-contrast, accessibility-tested dark theme with smooth glassmorphism.
+- **Undo & Saga Link**: Direct header access to the AG02 Control Plane dashboard.
 
-### Option B: Run Frontend with Vite Dev Server (Hot Reloading)
-```powershell
-# In a separate terminal:
-cd frontend
-npm install
-npm run dev
-```
-Open **[http://localhost:5173](http://localhost:5173)** (Vite proxies requests to the FastAPI backend).
-
-### UI Features
-1. **Interactive Chat Stream**: Input goals, view conversational turns, and inspect execution durations.
-2. **Preset Demo Buttons**: One-click demo triggers for multi-step weather comparisons, arithmetic, and search.
-3. **Visual Execution Stepper**: Vertical timeline mapping `USER REQUEST` → `AGENT DECISION` → `TOOL_CALL` → `TOOL_RESULT` → `AGENT DECISION` → `FINAL ANSWER`.
-4. **State JSON Inspector**: Toggle to inspect the raw `AgentState` payload with unique `run_id`, `call_id`, and ISO timestamps.
-5. **Privacy Shield**: Never renders private internal hidden chain-of-thought; displays concise decision metadata only.
+### 2. AG02 Saga & Undo Control Plane Dashboard
+Open **[http://localhost:8000/dashboard](http://localhost:8000/dashboard)** (or `/ag02/`).
+The AG02 control plane provides 9 real-time visual sections:
+1. **System Status & Health**: Live runtime metrics, active database, crash recovery state.
+2. **Current World State**: Live tracking of Flight Bookings, Hotel Reservations, Payment ledger, and Tickets.
+3. **Interactive Plan Runner**: Execute travel bookings (`book_flight`, `reserve_hotel`, `charge_payment`, `issue_ticket`).
+4. **The Undo Button**: Instantly triggers reverse compensation (`refund_payment`, `cancel_hotel`, `cancel_flight`) to restore the deterministic mock world back to its original state.
+5. **Approval Interlock**: Gated execution for irreversible actions (e.g. `send_confirmation_email`), requiring user approval before dispatch.
+6. **Failure & Fault Injection Matrix**: Injects failures at any step (e.g., Step 3 Payment failure) to demonstrate automatic reverse rollback.
+7. **Crash Simulator**: Simulates mid-transaction node crashes and tests automated recovery on reboot.
+8. **Durable SQLite Transaction Log**: Real-time audit log of transaction IDs, step states, and encrypted payloads.
+9. **Event Stream Log**: Live inspection of state transitions and compensation events.
 
 ---
 
@@ -277,13 +279,9 @@ Run the full pytest suite:
 pytest -v
 ```
 
-The **60 automated tests** include:
-- **Multi-step Tasks**: Weather + calculation, Search + calculation, Search + weather.
-- **Error Recovery**: Automatic recovery when tool calls fail with invalid inputs.
-- **Guardrails**: Maximum 8 tool calls per run, maximum iterations limit, and execution timeouts.
-- **Step Categorization**: Verification of `THINK/DECISION`, `TOOL_CALL`, `TOOL_RESULT`, and `FINAL` step logs.
-- **AST Safety**: Validates arithmetic and comparison expressions while strictly barring arbitrary code execution.
-- **Persistence**: SQLite session state and audit trail logging.
+The **126 automated tests** cover:
+- **Autonomous Agent**: Multi-step ReAct planning, AST safety, calculator comparisons, weather, search, browser automation, and token budgets (60 tests).
+- **AG02 Saga Engine**: Deterministic mock world, forward tools, exact compensations, failure matrices, durable SQLite logs, crash recovery, approval gates, and dashboard endpoints (66 tests).
 
 ---
 
